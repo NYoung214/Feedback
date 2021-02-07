@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="ISO-8859-1">
+	<title>Feedback Form</title>
+</head>
+<body>
+	<div style="border:1px solid black;margin:auto;width:300px;height:auto;">
+		<div style="text-align:center;">
+			<h1>Feedback Form</h1>
+		</div>
+		
+		<form>
+			<div style="width:80%;margin:auto;">
+				<p><input type="hidden" name="Id" value="-1"/></p>
+				<p><strong>Name (Optional): </strong><input type="text" name="name" id="name" placeholder="John"/></p>
+				<p><strong>Rating: </strong><select name="rating" id="rating">
+				  <option value="1">1</option>
+				  <option value="2">2</option>
+				  <option value="3">3</option>
+				  <option value="4">4</option>
+				  <option value="5" selected>5</option>
+				</select></p>
+				<textarea  name="comment" id="comment" rows="4" cols="30" placeholder="Insert Feedback here"></textarea>
+			</div>
+			<div style="margin:auto;width:50px;">
+				<button onclick="sendFeedback()">Send</button> 
+			</div>
+			
+		</form>
+		<div id="demo">Should show here</div>
+	</div>
+	
+	<script type="text/javascript">
+	function sendFeedback(){ 
+        
+        let name = document.querySelector('#name'); 
+        let rating = document.querySelector('#rating'); 
+        let comment = document.querySelector('#comment'); 
+           
+        // Creating a XHR object 
+        let xhr = new XMLHttpRequest(); 
+        let url = "http://localhost:8080/submit"; 
+    
+        // open a connection 
+        xhr.open("POST", url, true); 
+
+        // Set the request header i.e. which type of content you are sending 
+        xhr.setRequestHeader("Content-Type", "application/json"); 
+
+        // Create a state change callback 
+        xhr.onreadystatechange = function () { 
+            if (xhr.readyState === 4 && xhr.status === 200) { 
+                // Print received data from server 
+                result.innerHTML = this.responseText; 
+            } 
+        }; 
+
+        // Converting JSON data to string 
+        var data = JSON.stringify({ "name": name.value, "rating": rating.value, "comment": comment.value }); 
+
+        // Sending data with the request 
+        xhr.send(data); 
+    } 
+	</script>
+    
+    <script>
+	//Recieving from database
+	var myObj, x;
+	var txt = "";
+	var json = { table: "feedback", limit: 20 };
+	var feedbackParam = JSON.stringify(json);
+	var xmlhttp = new XMLHttpRequest();
+	xmlhttp.onreadystatechange = function() {
+	  if (this.readyState == 4 && this.status == 200) {
+	    myObj = JSON.parse(this.responseText);
+	    txt += "<table border='5'>"
+	    txt += "<tr><th>Name</th><th>Rating</th><th>Feedback</th></tr>"
+	    for (x in myObj) {
+	      txt += "<tr>"
+	      	+"<td>"+myObj[x].name+"</td>"
+	      	+"<td>"+myObj[x].rating+"</td>"
+	      	+"<td>"+myObj[x].comment+"</td>"
+	      	+ "</tr>";
+	    }
+	    txt += "</table>"    
+	    document.getElementById("demo").innerHTML = txt;
+	  }
+	};
+	xmlhttp.open("GET", "index", true);
+	xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+	xmlhttp.send("x=" + feedbackParam);   
+    </script>
+    
+</body>
+</html>
